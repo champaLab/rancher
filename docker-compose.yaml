@@ -1,54 +1,98 @@
+services:
+  ranchers:
+    image: rancher/rancher:v2.9.2
+    container_name: rancher-demo
+    privileged: true
+    environment:
+      - CATTLE_BOOTSTRAP_PASSWORD=System@88889999
+    volumes:
+      - /opt/rancher:/var/lib/rancher
+      - ${HOMEDIR}/certs/rancher:/var/lib/ca-certificates
+    restart: always
+    ports:
+      - 443:443
+      - 80:80
 # services:
-#   ranchers:
+#   # Traefik service (reverse proxy)
+#   traefik:
+#     image: traefik:v2.9
+#     container_name: traefik
+#     command:
+#       - "--api.insecure=true" # Enable the dashboard (optional)
+#       - "--providers.docker=true" # Enable Docker provider
+#       - "--entryPoints.web.address=:80" # HTTP entry point
+#       - "--entryPoints.websecure.address=:443" # HTTPS entry point
+#       - "--certificatesresolvers.le.acme.httpChallenge=true" # HTTP challenge for Let's Encrypt
+#       - "--certificatesresolvers.le.acme.httpChallenge.entryPoint=web"
+#       - "--certificatesresolvers.le.acme.email=sonephetmnlv@gmail.com" # Set your email for Let's Encrypt
+#       - "--certificatesresolvers.le.acme.storage=/acme.json" # Storage for certificates
+#     ports:
+#       - "80:80" # HTTP
+#       - "443:443" # HTTPS
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock"
+#       - "./acme.json:/acme.json" # Store certificates in acme.json
+#     restart: always
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.traefik.rule=Host(`.com`)" # Change to your Traefik dashboard URL
+
+#   # Rancher service
+#   rancher:
 #     image: rancher/rancher:v2.9.2
 #     container_name: rancher-demo
 #     privileged: true
+#     environment:
+#       - CATTLE_BOOTSTRAP_PASSWORD=admin1234 # You can set a secure password here
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.rancher.rule=Host(`rancher.yourdomain.com`)" # Change to your Rancher URL
+#       - "traefik.http.routers.rancher.entrypoints=websecure"
+#       - "traefik.http.routers.rancher.tls=true"
+#       - "traefik.http.routers.rancher.tls.certresolver=le" # Use Let's Encrypt
 #     volumes:
 #       - /opt/rancher:/var/lib/rancher
-#       - ${HOMEDIR}/certs/rancher:/var/lib/ca-certificates
 #     restart: always
-#     ports:
-#       - 443:443
-#       - 80:80
+# # version: "3.9"
+# # services:
+# #   traefik:
+# #     image: traefik:latest
+# #     container_name: traefik
+# #     command:
+# #       - --api.insecure=false
+# #       - --entrypoints.web.address=:80
+# #       - --entrypoints.websecure.address=:443
+# #       - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+# #       - --certificatesresolvers.letsencrypt.acme.email=sonephetmnlv@gmail.com
+# #       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+# #       - --providers.docker=true
+# #       - --providers.docker.exposedbydefault=false
+# #     ports:
+# #       - "80:80"
+# #       - "443:443"
+# #     volumes:
+# #       - /var/run/docker.sock:/var/run/docker.sock
+# #       - ./letsencrypt:/letsencrypt
+# #     restart: always
+# #     labels:
+# #       - --api.dashboard=true
+# #       - "traefik.http.routers.traefik.rule=Host(`printerapi.top`)"
+# #       - "traefik.http.routers.traefik.service=api@internal"
+# #       - "traefik.http.routers.traefik.entrypoints=websecure"
+# #       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
 
-services:
-  # Traefik service (reverse proxy)
-  traefik:
-    image: traefik:v2.9
-    container_name: traefik
-    command:
-      - "--api.insecure=true" # Enable the dashboard (optional)
-      - "--providers.docker=true" # Enable Docker provider
-      - "--entryPoints.web.address=:80" # HTTP entry point
-      - "--entryPoints.websecure.address=:443" # HTTPS entry point
-      - "--certificatesresolvers.le.acme.httpChallenge=true" # HTTP challenge for Let's Encrypt
-      - "--certificatesresolvers.le.acme.httpChallenge.entryPoint=web"
-      - "--certificatesresolvers.le.acme.email=sonephetmnlv@gmail.com" # Set your email for Let's Encrypt
-      - "--certificatesresolvers.le.acme.storage=/acme.json" # Storage for certificates
-    ports:
-      - "80:80" # HTTP
-      - "443:443" # HTTPS
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./acme.json:/acme.json" # Store certificates in acme.json
-    restart: always
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`printerapi.top`)" # Change to your Traefik dashboard URL
-
-  # Rancher service
-  rancher:
-    image: rancher/rancher:v2.9.2
-    container_name: rancher
-    privileged: true
-    environment:
-      - CATTLE_BOOTSTRAP_PASSWORD=System@000999 # You can set a secure password here
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.rancher.rule=Host(`jussun.com`)" # Change to your Rancher URL
-      - "traefik.http.routers.rancher.entrypoints=websecure"
-      - "traefik.http.routers.rancher.tls=true"
-      - "traefik.http.routers.rancher.tls.certresolver=le" # Use Let's Encrypt
-    volumes:
-      - /opt/rancher:/var/lib/rancher
-    restart: always
+# #   rancher:
+# #     image: rancher/rancher:latest
+# #     container_name: rancher
+# #     privileged: true
+# #     volumes:
+# #       - /opt/rancher:/var/lib/rancher
+# #     environment:
+# #       CATTLE_BOOTSTRAP_PASSWORD: System@000999
+# #     labels:
+# #       - "traefik.enable=true"
+# #       - "traefik.http.routers.rancher.rule=Host(`jussun.com`)"
+# #       - "traefik.http.routers.rancher.entrypoints=websecure"
+# #       - "traefik.http.routers.rancher.tls.certresolver=letsencrypt"
+# #       - "traefik.http.services.rancher.loadbalancer.server.port=443"
+# #     restart: always
