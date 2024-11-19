@@ -1,7 +1,7 @@
 services:
   ranchers:
     image: rancher/rancher:v2.9.2
-    container_name: rancher-demo
+    container_name: rancher
     privileged: true
     environment:
       - CATTLE_BOOTSTRAP_PASSWORD=System@88889999
