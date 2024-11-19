@@ -1,0 +1,54 @@
+# services:
+#   ranchers:
+#     image: rancher/rancher:v2.9.2
+#     container_name: rancher-demo
+#     privileged: true
+#     volumes:
+#       - /opt/rancher:/var/lib/rancher
+#       - ${HOMEDIR}/certs/rancher:/var/lib/ca-certificates
+#     restart: always
+#     ports:
+#       - 443:443
+#       - 80:80
+
+services:
+  # Traefik service (reverse proxy)
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    command:
+      - "--api.insecure=true" # Enable the dashboard (optional)
+      - "--providers.docker=true" # Enable Docker provider
+      - "--entryPoints.web.address=:80" # HTTP entry point
+      - "--entryPoints.websecure.address=:443" # HTTPS entry point
+      - "--certificatesresolvers.le.acme.httpChallenge=true" # HTTP challenge for Let's Encrypt
+      - "--certificatesresolvers.le.acme.httpChallenge.entryPoint=web"
+      - "--certificatesresolvers.le.acme.email=sonephetmnlv@gmail.com" # Set your email for Let's Encrypt
+      - "--certificatesresolvers.le.acme.storage=/acme.json" # Storage for certificates
+    ports:
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./acme.json:/acme.json" # Store certificates in acme.json
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`printerapi.top`)" # Change to your Traefik dashboard URL
+
+  # Rancher service
+  rancher:
+    image: rancher/rancher:v2.9.2
+    container_name: rancher
+    privileged: true
+    environment:
+      - CATTLE_BOOTSTRAP_PASSWORD=System@000999 # You can set a secure password here
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rancher.rule=Host(`jussun.com`)" # Change to your Rancher URL
+      - "traefik.http.routers.rancher.entrypoints=websecure"
+      - "traefik.http.routers.rancher.tls=true"
+      - "traefik.http.routers.rancher.tls.certresolver=le" # Use Let's Encrypt
+    volumes:
+      - /opt/rancher:/var/lib/rancher
+    restart: always
