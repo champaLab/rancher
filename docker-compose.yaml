@@ -10,8 +10,8 @@ services:
       - ${HOMEDIR}/certs/rancher:/var/lib/ca-certificates
     restart: always
     ports:
-      - 8443:443
-      - 8080:80
+      - 443:443
+      - 80:80
 # services:
 #   # Traefik service (reverse proxy)
 #   traefik:
